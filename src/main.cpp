@@ -276,6 +276,34 @@ String processor(const String &var)
   {
     return (settingsManager.getAppSettings().matchColor == 7) ? Selected : "";
   }
+  else if (var == "ACTION_COLOR_1")
+  {
+    return (settingsManager.getAppSettings().actionColor == 1) ? Selected : "";
+  }
+  else if (var == "ACTION_COLOR_2")
+  {
+    return (settingsManager.getAppSettings().actionColor == 2) ? Selected : "";
+  }
+  else if (var == "ACTION_COLOR_3")
+  {
+    return (settingsManager.getAppSettings().actionColor == 3) ? Selected : "";
+  }
+  else if (var == "ACTION_COLOR_4")
+  {
+    return (settingsManager.getAppSettings().actionColor == 4) ? Selected : "";
+  }
+  else if (var == "ACTION_COLOR_5")
+  {
+    return (settingsManager.getAppSettings().actionColor == 5) ? Selected : "";
+  }
+  else if (var == "ACTION_COLOR_6")
+  {
+    return (settingsManager.getAppSettings().actionColor == 6) ? Selected : "";
+  }
+  else if (var == "ACTION_COLOR_7")
+  {
+    return (settingsManager.getAppSettings().actionColor == 7) ? Selected : "";
+  }
 
   return String();
 }
@@ -508,6 +536,7 @@ void startWebserver()
         settings.touchRingActiveSequence = request->arg("touchRingActiveSequence").toInt();
         settings.scanColor = request->arg("scanColor").toInt();
         settings.matchColor = request->arg("matchColor").toInt();
+        settings.actionColor = request->arg("actionColor").toInt();
         settingsManager.saveAppSettings(settings);
         request->redirect("/");  
         shouldReboot = true;
@@ -611,6 +640,17 @@ void mqttCallback(char *topic, byte *message, unsigned int length)
       fingerManager.setIgnoreTouchRing(false);
     }
   }
+  if (String(topic) == String(settingsManager.getAppSettings().mqttRootTopic) + "/actionConfirmed")
+  {
+    if (messageTemp == "on")
+    {
+      fingerManager.setActionConfirmed(true);
+    }
+    else if (messageTemp == "off")
+    {
+      fingerManager.setActionConfirmed(false);
+    }
+  }
 
 #ifdef CUSTOM_GPIOS
   if (String(topic) == String(settingsManager.getAppSettings().mqttRootTopic) + "/customOutput1")
@@ -660,6 +700,7 @@ void connectMqttClient()
       Serial.println("connected");
       // Subscribe
       mqttClient.subscribe((settingsManager.getAppSettings().mqttRootTopic + "/ignoreTouchRing").c_str(), 1); // QoS = 1 (at least once)
+      mqttClient.subscribe((settingsManager.getAppSettings().mqttRootTopic + "/actionConfirmed").c_str(), 1); // QoS = 1 (at least once)
 #ifdef CUSTOM_GPIOS
       mqttClient.subscribe((settingsManager.getAppSettings().mqttRootTopic + "/customOutput1").c_str(), 1); // QoS = 1 (at least once)
       mqttClient.subscribe((settingsManager.getAppSettings().mqttRootTopic + "/customOutput2").c_str(), 1); // QoS = 1 (at least once)
@@ -862,7 +903,8 @@ void setup()
       }
       if (fingerManager.connected)
       {
-        fingerManager.configTouchRingActive(settingsManager.getAppSettings().touchRingActiveColor, settingsManager.getAppSettings().touchRingActiveSequence, settingsManager.getAppSettings().scanColor, settingsManager.getAppSettings().matchColor);
+        fingerManager.configTouchRingActive(settingsManager.getAppSettings().touchRingActiveColor, settingsManager.getAppSettings().touchRingActiveSequence,
+                                            settingsManager.getAppSettings().scanColor, settingsManager.getAppSettings().matchColor, settingsManager.getAppSettings().actionColor);
         fingerManager.setLedRingReady();
       }
       else

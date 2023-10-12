@@ -151,13 +151,14 @@ Matching fingerprints (and also ring events) are published as messages to your M
 
 <img  src="https://raw.githubusercontent.com/frickelzeugs/FingerprintDoorbell/master/doc/images/web-settings.png"  width="300">
 
-| MQTT Topic                           | Action    | Values | 
-| ------------------------------------ | --------- | -------- |
-| fingerprintDoorbell/ring             | publish   | "off" by default, on a ring event switching to "on" for 1s |
-| fingerprintDoorbell/matchId          | publish   | "-1" by default, if a match was found the value holds the matching id (e.g. "27") for 3s |
-| fingerprintDoorbell/matchName        | publish   | "" by default, if a match was found the value holds the matching name for 3s |
-| fingerprintDoorbell/matchConfidence  | publish   | "" by default, if a match was found the value holds the conficence (number between "1" and "400", 1=low, 400=very high) for 3s |
-| fingerprintDoorbell/ignoreTouchRing  | subscribe | read by FingerprintDoorbell and enables/disables the touch ring (see FAQ below for details) |
+| MQTT Topic                          | Action    | Values                                                                                                                         |
+| ----------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| fingerprintDoorbell/ring            | publish   | "off" by default, on a ring event switching to "on" for 1s                                                                     |
+| fingerprintDoorbell/matchId         | publish   | "-1" by default, if a match was found the value holds the matching id (e.g. "27") for 3s                                       |
+| fingerprintDoorbell/matchName       | publish   | "" by default, if a match was found the value holds the matching name for 3s                                                   |
+| fingerprintDoorbell/matchConfidence | publish   | "" by default, if a match was found the value holds the conficence (number between "1" and "400", 1=low, 400=very high) for 3s |
+| fingerprintDoorbell/ignoreTouchRing | subscribe | read by FingerprintDoorbell and enables/disables the touch ring (see FAQ below for details)                                    |
+| fingerprintDoorbell/actionConfirmed | subscribe | read by FingerprintDoorbell and gives colored feedback actionColor/red                                                         |
 
 ## Advanced Actions
 ### Firmware Update
@@ -176,16 +177,16 @@ As the name already says this will delete all your settings and fingerprints fro
 
 # FAQ
 ## What does the different colors/blinking styles of the LED ring mean?
-|LED ring color| sequence | Meaning | 
-| -------- | -------- | -------- |
-| red | permanent | System is in error state |
-| red | breathing | System in WiFi config mode |
-| red | flashing  | Finger on sensor detected (no match found yet) |
-| blue | permanent | System ready (touch ring ignored) |
-| blue | breathing | System ready (touch ring active) |
-| blue | flashing | System startup (not ready yet) |
-| purple | solid | Fingerprint match found or when in enrollment mode this means pass is finished, lift your finger |
-| purple | flashing | Enrollment active (waiting for finger) |
+| LED ring color | sequence  | Meaning                                                                                          |
+| -------------- | --------- | ------------------------------------------------------------------------------------------------ |
+| red            | permanent | System is in error state                                                                         |
+| red            | breathing | System in WiFi config mode                                                                       |
+| red            | flashing  | Finger on sensor detected (no match found yet)                                                   |
+| blue           | permanent | System ready (touch ring ignored)                                                                |
+| blue           | breathing | System ready (touch ring active)                                                                 |
+| blue           | flashing  | System startup (not ready yet)                                                                   |
+| purple         | solid     | Fingerprint match found or when in enrollment mode this means pass is finished, lift your finger |
+| purple         | flashing  | Enrollment active (waiting for finger)                                                           |
 
 ## What is the MQTT topic "fingerprintDoorbell/ignoreTouchRing" for and how to use it?
 If your sensor is mounted in a dry environment and cannot be hit by rain you can skip this section. Otherwise please read further. The sensor consists mainly of two parts: the black sensor surface and a metal ring divided by the led ring around the sensor surface. The sensor surface will only recognize a finger touch if the larger part of the finger was on the sensor and not only a small tip. Also only short touches are not recognizes, because no image could be captured in this short timespan. Because a visitor who just wants to ring the bell doesn't pay particular attention to putting his finger completely on the sensor, I do not only evaluate the image sensor itself, but also consider the finger detection signal (pin 5) the sensor is providing. This signal is already triggered if you slightly touch the sensor and even if you only touch the metal ring and not yet the sensor surface. 
